@@ -19,4 +19,4 @@ Institutional quant research framework (MVP).
 
 ## Notes
 
-This repo is organized around layered institutional-style components (data, features, signals, fusion, portfolio, execution, backtesting, evaluation). Step 1 focuses on clean contracts and timing/leakage safety.
+This repo is organized around layered institutional-style components (data, features, signals, fusion, portfolio, execution, backtesting, evaluation).
