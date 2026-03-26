@@ -1,0 +1,29 @@
+experiment_name: mvp_daily_ls_wproxy
+
+data:
+  source: yfinance
+  cache_dir: data/raw
+
+universe:
+  kind: sp500100_static
+
+frequency: 1d
+
+# Daily-first MVP defaults
+horizon_days: 5
+feature_lag_days: 1
+rebalance_cadence_days: 5
+
+costs:
+  commission_per_share: 0.0
+  slippage_bps: 5.0
+
+constraints:
+  max_positions: 25
+  max_gross_exposure: 1.0
+  allow_short: false
+
+model:
+  signal_model: least_squares_w_proxy
+  proxy: daily_ohlcv
+
