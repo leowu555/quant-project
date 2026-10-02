@@ -18,3 +18,6 @@ dist/
 
 .DS_Store
 
+data/raw/yfinance/
+data/processed/bars/
+

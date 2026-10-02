@@ -14,6 +14,8 @@ dependencies = [
   "pydantic>=2.6",
   "pyyaml>=6.0",
   "yfinance>=0.2.40",
+  "pyarrow>=15.0",
+  "duckdb>=1.0",
 ]
 
 [project.optional-dependencies]
@@ -66,6 +68,7 @@ force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py"]
 addopts = ["-ra", "-q"]
 

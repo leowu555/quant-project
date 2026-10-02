@@ -27,7 +27,7 @@ class BarFrame:
     timezone: str | None = None
 
     def validate(self) -> None:
-        required = {"open", "high", "low", "close", "volume"}
+        required = {"symbol", "open", "high", "low", "close", "volume"}
         missing = required.difference(set(self.data.columns))
         if missing:
             raise ValueError(f"BarFrame missing columns: {sorted(missing)}")

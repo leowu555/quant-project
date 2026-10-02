@@ -1,60 +1,40 @@
 # Quant Project
 
-A small (MVP) quant research framework that keeps the data/time semantics honest.
-Strategies are built as a pipeline with explicit “what you can know when” rules, so
-timing and leakage mistakes become testable failures.
+A leakage-aware research stack. V1 is a local Python system: data → features →
+labels → time-aware validation → models → portfolio → backtest → evaluation.
 
-## Architecture
+This repo is being built one subsystem at a time. **Only the data layer is
+implemented as production-quality V1 so far.**
 
-The pipeline goes left-to-right:
-`data -> features -> signals -> fusion -> portfolio -> execution -> backtest -> evaluation`.
+## V1 scope (in progress)
 
-Step 1’s goal is to define shared contracts between layers, via:
-`DataPipeline`, `FeatureEngineer`, `SignalModel`, `SignalFusion`,
-`PortfolioConstructor`, `ExecutionSimulator`, `BacktestEngine`, `Evaluator`.
+1. Multi-asset data pipeline — **done this round**
+2. Leakage-safe feature engine
+3. Forward-return labels
+4. Walk-forward / purge / embargo validation
+5. Momentum baseline, Elastic Net, XGBoost
+6. Portfolio construction (including CVXPY)
+7. Cost-aware backtest
+8. Evaluation metrics
+9. Research experiments
+10. Final methodology docs with measured results
 
-## Repo layout
+Not in V1: APIs, frontends, streaming, cloud, deep learning, order books.
 
-- `configs/`: YAML experiment configuration (the MVP lives here)
-- `data/`: data staging (`raw/`, `interim/`, `processed/`, `artifacts/`)
-- `docs/`: documentation (queued for deeper Step 1 write-ups)
-- `notebooks/`: exploratory work
-- `scripts/`: runnable entrypoints (runner stub planned for Step 1)
-- `reports/`: outputs from backtests/evaluations
-- `src/qtrading/`: the Python package
-  - `core/`: shared schemas + abstract interfaces + MVP config models
-  - `validation/`: timing/leakage validators with unit tests
-  - `data/`, `features/`, `signals/`, `models/`, `portfolio/`, `execution/`,
-    `backtest/`, `evaluation/`, `utils/`: placeholders for implementations
-- `tests/`: unit tests
+## Data layer (current)
 
-## What’s already implemented
+- `YFinanceDataPipeline`: daily OHLCV, UTC timestamps, deterministic sort
+- `validate_bars`: schema, duplicates, OHLC consistency
+- `fingerprint_bars` / `DatasetMetadata`: content hash for reproducibility
+- `BarStore`: Parquet write/read + DuckDB queries
 
-Core contracts in `src/qtrading/core/`:
-- `types.py`: dataclass “shapes” for bars/features/signals/orders/fills/positions/results
-- `interfaces.py`: ABCs for each pipeline layer
-- `clock.py`: MVP timestamp semantics helpers (horizon labeling + feature lag)
+```bash
+python -m pip install -r requirements.txt
+pytest
+python scripts/run_backtest.py --start 2020-01-01 --end 2020-03-31 --symbols AAPL MSFT
+```
 
-Config + YAML in `src/qtrading/core/config.py` + `configs/`:
-- `MVPConfig`: validated MVP settings (horizon/lag, rebalance cadence, costs, constraints)
-- `configs/base.yaml`: base MVP defaults
-- `configs/experiments/mvp_daily_ls_wproxy.yaml`: an example experiment config
+The runner stops after the data stage on purpose. Later stages should plug in
+behind the existing interfaces without rewriting ingestion.
 
-Timing/leakage validation in `src/qtrading/validation/`:
-- `leakage_checks.py`: `validate_lagged_features` + `validate_forward_return_labels`
-- `tests/test_timing_contracts.py`: synthetic tests to catch common alignment mistakes
-
-## Quick start
-
-1. Install deps:
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
-2. Run tests:
-   ```bash
-   pytest
-   ```
-3. Lint (optional if `ruff` is installed):
-   ```bash
-   ruff check .
-   ```
+Details: `docs/data_pipeline.md`.
